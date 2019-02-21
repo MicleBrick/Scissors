@@ -1,0 +1,24 @@
+From 6ba1b5acd52f6a742590bff4b69fcb45fbea8625 Mon Sep 17 00:00:00 2001
+From: miclebrick <miclebrick@outlook.com>
+Date: Tue, 19 Feb 2019 19:43:02 -0500
+Subject: [PATCH] Fix CME from async chunk getting
+
+
+diff --git a/src/main/java/net/minecraft/server/ChunkProviderServer.java b/src/main/java/net/minecraft/server/ChunkProviderServer.java
+index ad548590..929baf78 100644
+--- a/src/main/java/net/minecraft/server/ChunkProviderServer.java
++++ b/src/main/java/net/minecraft/server/ChunkProviderServer.java
+@@ -39,6 +39,10 @@ public class ChunkProviderServer implements IChunkProvider {
+ 
+         @Override
+         public Chunk get(long key) {
++            if (Thread.currentThread() != MinecraftServer.getServer().primaryThread) {
++                return super.get(key);
++            }
++
+             if (lastChunkByPos != null && key == lastChunkByPos.chunkKey) {
+                 return lastChunkByPos;
+             }
+-- 
+2.19.1
+
